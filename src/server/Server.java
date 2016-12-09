@@ -28,6 +28,7 @@ public class Server {
 
     public Server() throws IOException {
         server = new ServerSocket(3000, 10);
+        this.arcive=new Arcive();
     }
 
     public void run() {

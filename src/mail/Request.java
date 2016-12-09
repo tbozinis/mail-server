@@ -6,8 +6,6 @@
 package mail;
 
 import java.io.Serializable;
-import mail.Client;
-import mail.Mail;
 
 /**
  *

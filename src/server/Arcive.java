@@ -21,6 +21,7 @@ public class Arcive {
     }
 
     public Arcive() {
+        this.clients=new HashMap<>();
     }
 
     public int newClient(Client c) {

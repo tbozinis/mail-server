@@ -26,7 +26,7 @@ public class Client implements Serializable {
 
     public Client(String username) {
         this.username = username;
-        this.arcive = new ArrayList<Mail>();
+        this.arcive = new ArrayList<>();
     }
 
     public String getUsername() {
