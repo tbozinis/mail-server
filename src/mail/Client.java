@@ -19,6 +19,10 @@ public class Client implements Serializable {
     private String password;
     private ArrayList<Mail> arcive;
 
+    public int getNextId() {
+        return arcive.size();
+    }
+
     public Client(String username, ArrayList<Mail> arcive) {
         this.username = username;
         this.arcive = arcive;
@@ -26,6 +30,12 @@ public class Client implements Serializable {
 
     public Client(String username) {
         this.username = username;
+        this.arcive = new ArrayList<>();
+    }
+
+    public Client(String username, String password) {
+        this.username = username;
+        this.password = password;
         this.arcive = new ArrayList<>();
     }
 
@@ -38,6 +48,7 @@ public class Client implements Serializable {
     }
 
     public void addMail(Mail mail) {
+        mail.setId(arcive.size());
         arcive.add(mail);
     }
 
@@ -51,5 +62,18 @@ public class Client implements Serializable {
 
     public boolean isPasswordCorrect(String pass) {
         return password.equals(pass);
+    }
+
+    public Mail getMail(int mailI) {
+        return arcive.get(mailI);
+    }
+
+    public int deleteMail(int index) {
+        if (index >= arcive.size() || index < 0) {
+            return 1;
+        } else {
+            arcive.remove(index);
+            return 0;
+        }
     }
 }

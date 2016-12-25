@@ -28,7 +28,7 @@ public class Server {
 
     public Server() throws IOException {
         server = new ServerSocket(3000, 10);
-        this.arcive=new Arcive();
+        this.arcive = new Arcive();
     }
 
     public void run() {
@@ -44,12 +44,13 @@ public class Server {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (ClassNotFoundException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             });
 
             tempThread.start();
-            System.out.println("thread started...");
 
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,7 +58,7 @@ public class Server {
     }
 
     //kainourio request
-    private void newConection(Socket s) throws IOException, ClassNotFoundException {
+    private void newConection(Socket s) throws IOException, ClassNotFoundException, InterruptedException {
         ObjectOutputStream out;
         ObjectInputStream in;
         System.out.println("Connection received from " + s.getInetAddress().getHostName());
@@ -67,23 +68,46 @@ public class Server {
 
         Request r = (Request) in.readObject();
 
+        Answer a;
+        out.flush();
         //analoga me to req
         switch (r.getType()) {
             case NEW_MAIL:
-                //to bazoume stin lista tou mexri na to zitisei
-                ///clients.get(r.getMail().getReceiver()).addMail(r.getMail());
+                int i = arcive.newMail(r.getMail());
+                if (i == 1) {
+                    a = new Answer(Answer.Type.WRONG_USERNAME);
+                } else {
+                    a = new Answer(Answer.Type.NEW_MAIL_SEND);
+                }
+                out.writeObject(a);
+                System.out.println("done...");
                 break;
             case GET_MAILS:
-                ///ArrayList<Mail> mails = clients.get(r.getSender()).getUnreceivedMails(r.getMailIndex());
-                //sendMails(out, mails);
+                System.out.println("REQUEST GET_MAILS");
+                ArrayList<String> al = arcive.getMails(r.getSender());
+                a = new Answer(Answer.Type.GET_MAILS_RECEIVING);
+                a.setObj(al);
+                out.writeObject(a);
+                System.out.println("done...");
                 break;
             case NEW_CLIENT:
-                arcive.newClient(r.getClient());
-                System.out.println("- New client (" + r.getSender() + " )added...");
+                System.out.println(">>REQUEST NEW_CLIENT");
+                Client c = r.getClient();
+                if (arcive.newClient(c) == 1) {
+                    a = new Answer((Answer.Type.WRONG_USERNAME));
+                    out.writeObject(a);
+                    System.out.println("client already exists");
+                } else {
+                    a = new Answer((Answer.Type.ACCEPED));
+                    out.writeObject(a);
+                    System.out.println("- New client (" + r.getSender() + ")added...");
+                }
+                System.out.println("done...");
                 break;
             case LOGIN:
+                System.out.println(">>REQUEST LOGIN");
                 int ret = arcive.login(r.getSender(), r.getPasswored());
-                Answer a = null;
+                a = null;
                 switch (ret) {
                     case 0:
                         a = new Answer(Answer.Type.ACCEPED);
@@ -96,17 +120,40 @@ public class Server {
                         break;
                 }
                 out.writeObject(a);
-        }
+                System.out.println("done...");
+                break;
+            case GET_CLIENT:
+                System.out.println(">>REQUEST GET_CLIENT");
+                c = arcive.getClient(r.getSender());
+                a = new Answer(Answer.Type.CLIENT, c);
+                out.writeObject(a);
+                System.out.println("done...");
+                break;
+            case GET_MAIL:
+                System.out.println(">>REQUEST GET_MAIL");
 
-    }
-
-    //stelnei sto out ta mails pou zitise
-    private void sendMails(ObjectOutputStream out, ArrayList<Mail> mails) {
-        try {
-            out.writeObject(mails);
-        } catch (IOException ex) {
-            System.out.println("smth wend wrong...\n" + ex.toString());
+                c = arcive.getClient(r.getSender());
+                Mail m = c.getMail(r.getMailIndex());
+                if (m == null) {
+                    a = new Answer(Answer.Type.WRONG_ID);
+                } else {
+                    a = new Answer(Answer.Type.MAIL, m);
+                    arcive.getClient(r.getSender()).getArcive().get(r.getMailIndex()).opened();
+                }
+                out.writeObject(a);
+                break;
+            case DELETE_MAIL:
+                System.out.println(">>REQUEST DELETE_MAIL");
+                i = arcive.getClient(r.getSender()).deleteMail(r.getMailIndex());
+                if (i == 1) {
+                    a = new Answer(Answer.Type.WRONG_ID);
+                } else {
+                    a = new Answer(Answer.Type.MAIL_DELETED);
+                }
+                out.writeObject(a);
+                break;
         }
+        System.out.println("connection ended...");
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
