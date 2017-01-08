@@ -25,10 +25,12 @@ public class Server {
 
     private ServerSocket server;
     private Socket conection;
+    private int port;
 
-    public Server() throws IOException {
-        server = new ServerSocket(3000, 10);
+    public Server(int port) throws IOException {
+        server = new ServerSocket(port, 10);
         this.arcive = new Arcive();
+        this.port = port;
     }
 
     public void run() {
@@ -157,11 +159,35 @@ public class Server {
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        Server celia = new Server();
+        try {
+            int p = Integer.parseInt(args[0]);
 
-        while (true) {
-            celia.run();
-            Thread.sleep(500);
+            Server celia = new Server(p);
+
+            celia.makeCnM();
+
+            while (true) {
+                celia.run();
+                Thread.sleep(500);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
         }
+
     }
+
+    //the clients and their mails
+    protected void makeCnM() {
+        this.arcive.newClient(new Client("celia", "2010"));
+        this.arcive.newClient(new Client("theodor", "1916"));
+
+        for (int m = 0; m < 3; m++) {
+            Mail mail = new Mail("theodor", "celia", "test mail " + Integer.toString(m), "test mail " + Integer.toString(m));
+            this.arcive.newMail(mail);
+            mail = new Mail("celia", "theodor", "test mail " + Integer.toString(m), "test mail " + Integer.toString(m));
+            this.arcive.newMail(mail);
+        }
+
+    }
+
 }
