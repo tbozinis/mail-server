@@ -37,7 +37,6 @@ public class Mail implements Serializable {
         this.receiver = receiver;
         this.subject = subject;
         this.mainBody = mainBody;
-        this.id = id;
         this.opened = false;
     }
 
