@@ -33,6 +33,9 @@ public class Server {
         this.port = port;
     }
 
+    /**
+     * Listens for a new connection.
+     */
     public void run() {
         try {
             conection = server.accept();
@@ -163,7 +166,7 @@ public class Server {
             int p = Integer.parseInt(args[0]);
 
             Server celia = new Server(p);
-
+            System.out.println("Wellcome to Thlia server!\n\n");
             celia.makeCnM();
 
             while (true) {
@@ -173,7 +176,6 @@ public class Server {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
     }
 
     //the clients and their mails
@@ -187,7 +189,6 @@ public class Server {
             mail = new Mail("celia", "theodor", "test mail " + Integer.toString(m), "test mail " + Integer.toString(m));
             this.arcive.newMail(mail);
         }
-
     }
 
 }
