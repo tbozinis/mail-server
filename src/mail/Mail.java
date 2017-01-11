@@ -79,10 +79,11 @@ public class Mail implements Serializable {
     
     @Override
     public String toString() {
-        String ret = "";
-        ret+="FROM: "+this.sender;
-        ret+="\nSUBJECT: "+this.subject;
-        ret+="\n\n"+this.mainBody;
+        String ret = "\n--------------------------------------------------\n";
+        ret += "FROM: " + this.sender;
+        ret += "\nSUBJECT: " + this.subject;
+        ret += "\n\n" + this.mainBody;
+        ret += "\n--------------------------------------------------";
         return ret;
     }
     
