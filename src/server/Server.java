@@ -9,10 +9,8 @@ import mail.Request;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.SSLServerSocket;
 import mail.*;
 
 /**
@@ -45,11 +43,7 @@ public class Server {
                 public void run() {
                     try {
                         newConection(conection);
-                    } catch (IOException ex) {
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InterruptedException ex) {
+                    } catch (IOException | ClassNotFoundException | InterruptedException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -171,9 +165,9 @@ public class Server {
 
             while (true) {
                 celia.run();
-                Thread.sleep(500);
+                Thread.sleep(100);
             }
-        } catch (Exception ex) {
+        } catch (NumberFormatException | IOException | InterruptedException ex) {
             System.out.println(ex.toString());
         }
     }
